@@ -1,6 +1,8 @@
 #include <iostream>
+#include <mysqlx/xdevapi.h>
 #include "member.h"
 using namespace std;
+using mysqlx::SessionOption;
 
 Member create_account() {
 	string first_name;
@@ -9,18 +11,43 @@ Member create_account() {
 	cout << "Thank you for choosing Elijah Bank!" << endl;
 	cout << "Please enter your first name: ";
 	cin >> first_name;
-	cout << "\nPlease enter your last name: ";
+	cout << "Please enter your last name: ";
 	cin >> last_name;
 
 	Member new_member;
 	new_member.set_name(first_name, last_name);
-	new_member.set_account_no(28675309);
+	new_member.set_account_no(8675309);
 
 	return new_member;
 
 }
 
 int main() {
+
+	try {
+		cout << "Creating session..." << endl;
+		mysqlx::Session sess(SessionOption::HOST, "localhost",
+							 SessionOption::PORT, 33060,
+							 SessionOption::USER, "root");
+							 //SessionOption::PWD, "");
+		cout << "We have a session. Creating schema..." << endl;
+		mysqlx::Schema sch = sess.getSchema("users");
+		cout << "We have a schema. Creating collection..." << endl;
+		mysqlx::Collection coll = sch.createCollection("c1", true);
+		cout << "We have a collection." << endl;
+		coll.remove("true").execute();
+	} catch (const mysqlx::Error &err) {
+		cout << "ERROR: " << err << endl;
+		return 1;
+	} catch (exception &ex) {
+		cout << "STD EXCEPTION: " << ex.what() << endl;
+		return 1;
+	} catch (const string ex) {
+		cout << "EXCEPTION: " << ex << endl;
+		return 1;
+	}
+
+
 	cout << "Welcome to the Elijah Bank." << endl;
 	string response;
 	bool good_response = false;
