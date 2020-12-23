@@ -1,61 +1,60 @@
 #include <iostream>
 #include <mysqlx/xdevapi.h>
 #include "member.h"
-using namespace std;
-using mysqlx::SessionOption;
+#include "server.h"
+#include <string>
+#include <unistd.h>
+using ::std::cout;
+using ::std::end;
+using ::std::cin;
+using ::std::endl;
 
-Member create_account() {
+
+
+Member create_account(Server server) {
 	string first_name;
 	string last_name;
+	string user;
+	float amount;
+	Member member;
 
 	cout << "Thank you for choosing Elijah Bank!" << endl;
 	cout << "Please enter your first name: ";
 	cin >> first_name;
 	cout << "Please enter your last name: ";
 	cin >> last_name;
+	cout << "What would you like your username to be? ";
+	cin >> user; 
+	cout << "How much would you like to deposit initially? ";
+	cin >> amount;
 
-	Member new_member;
-	new_member.set_name(first_name, last_name);
-	new_member.set_account_no(8675309);
+	int ans = server.addUser(first_name, last_name, user, amount);
+	if (ans >= 0) {
+		// access the new member to return
+		member.set_name(first_name, last_name);
+		member.set_user_name(user);
+		member.set_account_no(ans);
+		member.set_balance(amount);
+	}
+	else {
+		cout << "Error number " << ans << endl;
+	}
 
-	return new_member;
+	return member;
 
 }
 
 int main() {
 
-	try {
-		cout << "Creating session..." << endl;
-		mysqlx::Session sess(SessionOption::HOST, "localhost",
-							 SessionOption::PORT, 33060,
-							 SessionOption::USER, "root");
-							 //SessionOption::PWD, "");
-		cout << "We have a session. Creating schema..." << endl;
-		mysqlx::Schema sch = sess.getSchema("users");
-		cout << "We have a schema. Creating collection..." << endl;
-		mysqlx::Collection coll = sch.createCollection("c1", true);
-		cout << "We have a collection." << endl;
-		coll.remove("true").execute();
-	} catch (const mysqlx::Error &err) {
-		cout << "ERROR: " << err << endl;
-		return 1;
-	} catch (exception &ex) {
-		cout << "STD EXCEPTION: " << ex.what() << endl;
-		return 1;
-	} catch (const string ex) {
-		cout << "EXCEPTION: " << ex << endl;
-		return 1;
-	}
-
-
 	cout << "Welcome to the Elijah Bank." << endl;
 	string response;
+	Server server;
 	bool good_response = false;
 	
 
 	do {
 		cout << "Do you have an account already or would you like to make one?" << endl;
-		cout << " -- Print 'access' or 'make' to continue. -- " << endl;
+		cout << " -- Print 'access', or 'make' to continue, or 'quit' to leave. -- " << endl;
 		cin >> response;
 
 		if (response.compare("access") == 0) {
@@ -63,8 +62,16 @@ int main() {
 		}
 		else if (response.compare("make") == 0) {
 			good_response = true;
-			Member new_member = create_account();
-			cout << "Welcome, " << new_member.get_name() << "!" << endl;
+			Member new_member = create_account(server);
+			if (new_member.get_account_no() >= 0) {
+				cout << "Welcome, " << new_member.get_name() << "!" << endl;
+			}
+			else {
+				cout << "I'm sorry, it appears that something went wrong." << endl;
+			}
+		}
+		else if (response.compare("quit") == 0) {
+			good_response = true;
 		}
 		else {
 			cout << "I'm sorry, that isn't an accepted answer. Please try again." << endl;

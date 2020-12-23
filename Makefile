@@ -11,10 +11,13 @@ CXXFLAGS = -std=c++11
 #DEBUGGING_FLAGS = -g -O0
 #C_FLAGS = $(CONSERVATIVE_FLAGS) $(DEBUGGING_FLAGS)
 
-bank: bank.o member.o
-	$(CXX) -o bank bank.o member.o $(CPPFLAGS) $(LDLIBS)
+bank: member.o server.o bank.o
+	$(CXX) -o bank member.o server.o bank.o $(CPPFLAGS) $(LDLIBS)
 
-bank.o: member.h
+server.o: member.h server.h
+	$(CXX) $(CXXFLAGS) -c server.cpp
+
+bank.o: member.h server.h
 	$(CXX) $(CXXFLAGS) -c bank.cpp
 
 member.o: member.h
