@@ -44,6 +44,21 @@ Member create_account(Server server) {
 
 }
 
+Member access_account(Server server) {
+	string username;
+	Member member;
+
+	cout << "Please enter your username: ";
+	cin >> username;
+
+	int ans = server.userExists(username);
+	if (ans >= 1) {
+		member = server.findUser(username);
+	}
+	
+	return member;
+}
+
 int main() {
 
 	cout << "Welcome to the Elijah Bank." << endl;
@@ -59,6 +74,13 @@ int main() {
 
 		if (response.compare("access") == 0) {
 			good_response = true;
+			Member member = access_account(server);
+			if (member.get_account_no() >= 0) {
+				cout << "Welcome, " << member.get_name() << "!" << endl;
+			}
+			else {
+				cout << "I'm sorry, it appears that something went wrong." << endl;
+			}
 		}
 		else if (response.compare("make") == 0) {
 			good_response = true;

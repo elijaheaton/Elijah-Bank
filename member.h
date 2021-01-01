@@ -16,11 +16,11 @@ public:
 	void set_name(string first_name, string last_name);
 	void set_user_name(string user_name);
 	void set_account_no(int account_no);
-	void set_balance(int amount);
+	void set_balance(float amount);
 	string get_name();
 	string get_user_name();
 	int get_account_no();
-	int get_balance();
+	float get_balance();
 };
 
 #endif

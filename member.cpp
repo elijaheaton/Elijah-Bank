@@ -15,7 +15,7 @@ void Member::set_account_no(int account_no) {
 	this->account_no = account_no;
 }
 
-void Member::set_balance(int amount) {
+void Member::set_balance(float amount) {
 	this->amount = amount;
 }
 
@@ -31,6 +31,6 @@ int Member::get_account_no() {
 	return this->account_no;
 }
 
-int Member::get_balance() {
+float Member::get_balance() {
 	return this->amount;
 }

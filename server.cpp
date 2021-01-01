@@ -117,5 +117,87 @@ using ::mysqlx::Row;
 			return -7;
 		}
 
-		return true;
+		return userId;
+	}
+
+
+	int Server::userExists(string username) {
+		if (checkEmpty(username)) {
+			return -1;
+		}
+		try {
+			Session session(SessionOption::HOST, "localhost",
+							SessionOption::PORT, 33060,
+							SessionOption::USER, usernameForDB,
+							SessionOption::PWD, passwordForDB);
+			Table users = session.getSchema("bank").getTable("Accounts");
+
+			// check if username is in db
+			RowResult res = users.select("UserName")
+							 	 .where("UserName = :u")
+							 	 .bind("u", username)
+							 	 .execute();
+			return res.count();
+		}
+		catch (const Error &err) {
+			cout << "ERROR: " << err << endl;
+			return -5;
+		} 
+		catch (exception &ex) {
+			cout << "STD EXCEPTION: " << ex.what() << endl;
+			return -6;
+		} 
+		catch (const char *ex) {
+			cout << "EXCEPTION: " << ex << endl;
+			return -7;
+		}
+
+		return -8;
+
+	}
+
+
+	Member Server::findUser(string username) {
+		Member member;
+
+		if (checkEmpty(username)) {
+			return member;
+		}
+		try {
+			Session session(SessionOption::HOST, "localhost",
+							SessionOption::PORT, 33060,
+							SessionOption::USER, usernameForDB,
+							SessionOption::PWD, passwordForDB);
+			Table users = session.getSchema("bank").getTable("Accounts");
+
+			// check if username is in db
+			RowResult res = users.select("UserName")
+							 	 .where("UserName = :u")
+							 	 .bind("u", username)
+							 	 .execute();
+			
+			if (res.count() == 1) {
+				Row row = users.select("UserName", "FirstName", "LastName", "ID", "amount").where("UserName = :u")
+						   .bind("u", username).execute().fetchOne();
+			
+
+				// do stuff with row array
+				member.set_user_name(string(row[0]));
+				member.set_name(string(row[1]), string(row[2]));
+				member.set_account_no(row[3]);
+				member.set_balance(row[4]);
+				
+			}
+		}
+		catch (const Error &err) {
+			cout << "ERROR: " << err << endl;
+		} 
+		catch (exception &ex) {
+			cout << "STD EXCEPTION: " << ex.what() << endl;
+		} 
+		catch (const char *ex) {
+			cout << "EXCEPTION: " << ex << endl;
+		}
+
+		return member;
 	}

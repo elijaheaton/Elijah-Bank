@@ -14,6 +14,8 @@ private:
 	bool strcmpin(string a, string b);
 public:
 	int addUser(string first, string last, string user, float amount);
+	int userExists(string username);
+	Member findUser(string username);
 };
 
 #endif
